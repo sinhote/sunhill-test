@@ -36,7 +36,7 @@ public class Account {
 		if (newBalance >= 0)
 			balance = newBalance;
 		else
-			throw new OverdraftException(amount);
+			throw new OverdraftException(amount, balance);
 	}
 
 	@Override

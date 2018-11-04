@@ -17,19 +17,26 @@ public class CheckingAccount extends Account {
 
 	public CheckingAccount(String owner, double overdraft) {
 		super(owner);
-		setOverdraft(overdraft);
+		try {
+			setOverdraft(overdraft);
+		} catch (OverdraftException e) {
+			// This can never happen, because the balance is always zero on creation, and overdraft can never be positive
+		}
 	}
 
 	public double getOverdraft() {
 		return overdraft;
 	}
 
-	public void setOverdraft(double overdraft) {
-		if (overdraft > 0) 
+	public void setOverdraft(double newOverdraft) throws OverdraftException {
+		if (newOverdraft > 0) 
 			throw new IllegalArgumentException("Overdraft must be negative");
 
 		synchronized(this.overdraft) {
-			this.overdraft = overdraft;
+			if (newOverdraft < balance)
+				this.overdraft = newOverdraft;
+			else
+				throw new OverdraftException(newOverdraft, balance);
 		}
 	}
 
@@ -47,7 +54,7 @@ public class CheckingAccount extends Account {
 			if (newBalance >= overdraft)
 				balance = newBalance;
 			else
-				throw new OverdraftException(amount);
+				throw new OverdraftException(amount, balance);
 		}
 	}
 

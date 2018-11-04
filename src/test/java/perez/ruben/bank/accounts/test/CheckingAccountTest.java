@@ -52,7 +52,7 @@ public class CheckingAccountTest {
 	}	
 
 	@Test
-	public void testSetNegativeOverdraft() {
+	public void testSetNegativeOverdraft() throws OverdraftException {
 		double theOverdraft = -2000;
 
 		CheckingAccount theAccount = new CheckingAccount(testOwner);
@@ -64,7 +64,7 @@ public class CheckingAccountTest {
 	}
 
 	@Test
-	public void testSetPositiveOverdraft() {
+	public void testSetPositiveOverdraft() throws OverdraftException {
 		double theOverdraft = 2000;
 
 		CheckingAccount theAccount = new CheckingAccount(testOwner);
@@ -78,6 +78,29 @@ public class CheckingAccountTest {
 		}	
 	}
 
+	@Test
+	public void testSetOverdraftGreaterThanCurrentBalance() throws OverdraftException {
+		double theOverdraft = -2000;
+		double theBalance = -3000;
+
+		CheckingAccount theAccount = new CheckingAccount(testOwner);
+		assertEquals(0.0, theAccount.getOverdraft(), delta);
+		
+		// Set balance and overdraft to the same value
+		theAccount.setOverdraft(theBalance);
+		theAccount.deposit(theBalance);
+		assertEquals(theBalance, theAccount.getBalance(), delta);
+		assertEquals(theBalance, theAccount.getOverdraft(), delta);
+		
+		// Try to change the overdraft to a greater value
+		try {
+			theAccount.setOverdraft(theOverdraft);
+			fail("The overdraft value must not be greater than the balance, but setting a value of " + theOverdraft + " with a balance of " + theBalance + " did not fail");
+		} catch (OverdraftException iae) {
+			// OK!
+		}	
+	}
+	
 	@Test
 	public void testAddBalanceWithoutOverdraft() throws OverdraftException {
 
