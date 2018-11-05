@@ -1,5 +1,21 @@
 # Sunhill Practical Development Task: Bank Accounts
 
+## Compile this project
+
+In the root folder of the project, run:
+
+    mvn clean install
+
+After the unit tests complete and the build finishes successfully, a file with name `bank-0.0.1-SNAPSHOT.jar` will be created in the `target` folder.
+
+## Run this project
+
+For convenience, the generated `.jar` file can be run directly as:
+
+    java -jar bank-0.0.1-SNAPSHOT.jar
+
+## Description of the classes, design decisions and assumptions
+
 A set of classes representing bank accounts with certain operational characteristics have been developed as requested. The main characteristics are:
 
 * They must work concurrently:
@@ -25,4 +41,40 @@ A set of classes representing bank accounts with certain operational characteris
   4. Now the withdrawal operation goes on, but it fails because it violates the overdraft constraint.
   
 * Instances of `CheckingAccount` may transfer money to another `CheckingAccount` instance. Calls to `transfer` are synchronized and are guaranteed to happen in order.
-  * Note: This does not mean that transfers from account A to account B may not be interspersed with transfers from B to A or separate deposits to A or B while the transfer is not completed. Doing so requires a more complex locking mechanism which seemed out of scope for this exercise..
+  * Note: This does not mean that transfers from account A to account B may not be interspersed with transfers from B to A or separate deposits to A or B while the transfer is not completed. Doing so requires a more complex locking mechanism which seemed out of scope for this exercise.
+
+#### A note about the executable interactive menu
+
+The task description reads exactly:
+
+> The solution has to be easily executable
+
+So, for instance, a very simple executable to showcase the `SavingsAccount` could be:
+
+```java
+import perez.ruben.bank.accounts.SavingsAccount;
+import perez.ruben.bank.exception.OverdraftException;
+
+public class SampleRun {
+
+  public static void main(String[] argv) throws OverdraftException {
+    System.out.println("Create savings account");
+    SavingsAccount acc = new SavingsAccount("John Doe", 0.0125);
+    System.out.println("Created: " + acc);
+    
+    System.out.println("Add 5000 to the balance");
+    acc.deposit(5000);
+    System.out.println("Done: " + acc);
+
+    System.out.println("The generated interest is: " + acc.getInterest());
+		
+    System.out.println("Pay interest");
+    acc.payInterest();
+    System.out.println("Done: " + acc);
+  }
+}
+```
+
+But then, I consider that this code is very similar to a series of unit tests put together without the assert statements, and therefore it does not add much value. The unit tests are better structured than a casual program like the one above, so in my opinion they showcase the implemented functionality much better.
+
+For this reason, the delivered executable (implemented in `InteractiveMenu.java`) does not intend to showcase the proposed classes' simplicity (it should be clear by reading the source code), but to provide a tool to _"play" with the solution_ without having to write boilerplate code.
